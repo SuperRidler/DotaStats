@@ -68,6 +68,14 @@ public class Personal {
 		System.out.println(matchIds.size());
 	}
 
+	public static JsonObject getMatchDetails(int matchId) {
+		return getMatchDetails(String.valueOf(matchId));
+	}
+	
+	public static JsonObject getMatchDetails(String matchId) {
+		return getJsonRequest(detailsAddress + "match_id=" + matchId + "&");
+	}
+	
 	public static JsonObject getJsonRequest(String url) {
 		JsonObject obj = new JsonObject();
 		try {
