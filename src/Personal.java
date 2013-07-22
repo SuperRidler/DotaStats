@@ -16,13 +16,13 @@ public class Personal {
 	private static String historyAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key=";
 	private static String detailsAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/?key=";
 	private static final String myId = "76561198005679168";
-	
+
 	public static void main(String[] args) {
 		loadKey();
+		getMatchIds();
 		System.out.println("Done");
 	}
 
-	
 	public static void loadKey() {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(keyFile));
