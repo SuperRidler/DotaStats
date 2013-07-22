@@ -46,4 +46,28 @@ public class Personal {
 		JsonObject obj = getJsonRequest(personalLink);
 	}
 
+	public static JsonObject getJsonRequest(String url) {
+		JsonObject obj = new JsonObject();
+		try {
+			URL requestAddress = new URL(url);
+			URLConnection uc = requestAddress.openConnection();
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					uc.getInputStream()));
+			String inputLine = "";
+			String totalInput = "";
+			while ((inputLine = in.readLine()) != null) {
+				totalInput += inputLine;
+			}
+			in.close();
+			obj = new JsonParser().parse(totalInput).getAsJsonObject();
+		} catch (MalformedURLException e) {
+			System.out.println("Could not create URL object.");
+			e.printStackTrace();
+			System.exit(1);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return obj;
+	}
 }
