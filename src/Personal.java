@@ -2,7 +2,13 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class Personal {
 
