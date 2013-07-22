@@ -40,4 +40,10 @@ public class Personal {
 			System.exit(1);
 		}
 	}
+
+	public static void getMatchIds() {
+		String personalLink = historyAddress + "account_id=" + myId + "&";
+		JsonObject obj = getJsonRequest(personalLink);
+	}
+
 }
