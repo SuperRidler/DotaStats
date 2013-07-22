@@ -27,6 +27,7 @@ public class Personal {
 		System.out.println("Done");
 	}
 
+	/* Attach the API key to the URLs for use. */
 	public static void loadKey() {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(keyFile));
@@ -46,6 +47,7 @@ public class Personal {
 		}
 	}
 
+	/* Puts all the match ids into an ArrayList for the predefined player id. */
 	public static void getMatchIds() {
 		ArrayList<Integer> matchIds = new ArrayList<Integer>();
 		String matchId = "";
@@ -68,14 +70,17 @@ public class Personal {
 		System.out.println(matchIds.size());
 	}
 
+	/* Get the match details for a match id int. */
 	public static JsonObject getMatchDetails(int matchId) {
 		return getMatchDetails(String.valueOf(matchId));
 	}
 	
+	/* Get the match details for a match id string. */
 	public static JsonObject getMatchDetails(String matchId) {
 		return getJsonRequest(detailsAddress + "match_id=" + matchId + "&");
 	}
 	
+	/* Return a json object from the  given url. */
 	public static JsonObject getJsonRequest(String url) {
 		JsonObject obj = new JsonObject();
 		try {
