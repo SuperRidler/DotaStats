@@ -47,8 +47,25 @@ public class Personal {
 	}
 
 	public static void getMatchIds() {
-		String personalLink = historyAddress + "account_id=" + myId + "&";
-		JsonObject obj = getJsonRequest(personalLink);
+		ArrayList<Integer> matchIds = new ArrayList<Integer>();
+		String matchId = "";
+		int matchesLeft = 25;
+		while (matchesLeft > 0) {
+			String personalLink = historyAddress + "account_id=" + myId
+					+ "&start_at_match_id=" + matchId;
+			JsonObject obj = getJsonRequest(personalLink);
+			JsonObject result = obj.getAsJsonObject("result");
+			matchesLeft = result.get("results_remaining").getAsInt();
+			JsonArray matches = result.getAsJsonArray("matches");
+			Iterator<JsonElement> it = matches.iterator();
+			while (it.hasNext()) {
+				JsonObject iobj = it.next().getAsJsonObject();
+				matchIds.add(iobj.get("match_id").getAsInt());
+			}
+			matchId = String.valueOf(matchIds.get(matchIds.size()-1) - 1);
+		}
+		System.out.println(matchIds);
+		System.out.println(matchIds.size());
 	}
 
 	public static JsonObject getJsonRequest(String url) {
