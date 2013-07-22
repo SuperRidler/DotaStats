@@ -27,6 +27,7 @@ public class Personal {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(keyFile));
 			String key = br.readLine();
+			br.close();
 			key += "&";
 			historyAddress += key;
 			detailsAddress += key;
