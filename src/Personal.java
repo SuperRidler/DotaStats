@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -13,22 +14,49 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mysql.jdbc.Connection;
 
 public class Personal {
 
+	private static final String driver = "org.gjt.mm.mysql.Driver";
+	private static final String url = "jdbc:mysql://localhost/DotaStats";
 	private static final String keyFile = "key";
 	private static String historyAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key=";
 	private static String detailsAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/?key=";
 	private static final String myId = "76561198005679168";
 	private static ArrayList<Integer> matchIds;
+	private static Connection con;
 
 	public static void main(String[] args) {
+		connectToDB();
 		loadKey();
 		getMatchIds();
 		loadMatches();
+		closeDB();
 		System.out.println("Done");
 	}
 
+	public static void connectToDB() {
+		try {
+			Class.forName(driver);
+			con = (Connection) DriverManager.getConnection(url, "root", "");
+		} catch (Exception e) {
+			System.out.println("Failed to connect to the database.");
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
+	public static void closeDB() {
+		try {
+			con.close();
+		} catch (Exception e) {
+			System.out.println("Failed to close the database connection.");
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
 	/* Attach the API key to the URLs for use. */
 	public static void loadKey() {
 		try {
@@ -117,7 +145,7 @@ public class Personal {
 					JsonObject ability_upgrade = ability_upgrade_elem.getAsJsonObject();
 					int ability = ability_upgrade.get("ability").getAsInt();
 					int time = ability_upgrade.get("time").getAsInt();
-					int level = ability_upgrade.get("level").getAsInt();
+					int levell = ability_upgrade.get("level").getAsInt();
 				}
 			}
 		}
