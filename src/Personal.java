@@ -25,6 +25,7 @@ public class Personal {
 	public static void main(String[] args) {
 		loadKey();
 		getMatchIds();
+		loadMatches();
 		System.out.println("Done");
 	}
 
@@ -80,8 +81,51 @@ public class Personal {
 		return getJsonRequest(detailsAddress + "match_id=" + matchId + "&");
 	}
 	
+	/* Use the match ids to load the match data. */
+	public static void loadMatches() {
+		for (Integer i : matchIds) {
+			JsonObject matchInfo = getMatchDetails(i);
+			JsonObject resultObj = matchInfo.getAsJsonObject("result");
+			JsonArray players = resultObj.getAsJsonArray("players");
+			for (JsonElement player : players) {
+				JsonObject playerObj = player.getAsJsonObject();
+				int account_id = playerObj.get("account_id").getAsInt();
+				int player_slot = playerObj.get("player_slot").getAsInt();
+				int hero_id = playerObj.get("hero_id").getAsInt();
+				int item_0 = playerObj.get("item_0").getAsInt();
+				int item_1 = playerObj.get("item_1").getAsInt();
+				int item_2 = playerObj.get("item_2").getAsInt();
+				int item_3 = playerObj.get("item_3").getAsInt();
+				int item_4 = playerObj.get("item_4").getAsInt();
+				int item_5 = playerObj.get("item_5").getAsInt();
+				int kills = playerObj.get("kills").getAsInt();
+				int deaths = playerObj.get("deaths").getAsInt();
+				int assists = playerObj.get("assists").getAsInt();
+				int leaver_status = playerObj.get("leaver_status").getAsInt();
+				int gold = playerObj.get("gold").getAsInt();
+				int last_hits = playerObj.get("last_hits").getAsInt();
+				int denies = playerObj.get("denies").getAsInt();
+				int gold_per_min = playerObj.get("gold_per_min").getAsInt();
+				int xp_per_min = playerObj.get("xp_per_min").getAsInt();
+				int gold_spent = playerObj.get("gold_spent").getAsInt();
+				int hero_damage = playerObj.get("hero_damage").getAsInt();
+				int tower_damage = playerObj.get("tower_damage").getAsInt();
+				int hero_healing = playerObj.get("hero_healing").getAsInt();
+				int level = playerObj.get("level").getAsInt();
+				JsonArray abilities = playerObj.getAsJsonArray("ability_upgrades");
+				for (JsonElement ability_upgrade_elem : abilities) {
+					JsonObject ability_upgrade = ability_upgrade_elem.getAsJsonObject();
+					int ability = ability_upgrade.get("ability").getAsInt();
+					int time = ability_upgrade.get("time").getAsInt();
+					int level = ability_upgrade.get("level").getAsInt();
+				}
+			}
+		}
+	}
+	
 	/* Return a json object from the  given url. */
 	public static JsonObject getJsonRequest(String url) {
+		System.out.println(url);
 		JsonObject obj = new JsonObject();
 		try {
 			URL requestAddress = new URL(url);
