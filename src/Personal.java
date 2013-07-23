@@ -20,6 +20,7 @@ public class Personal {
 	private static String historyAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key=";
 	private static String detailsAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/?key=";
 	private static final String myId = "76561198005679168";
+	private static ArrayList<Integer> matchIds;
 
 	public static void main(String[] args) {
 		loadKey();
@@ -49,7 +50,7 @@ public class Personal {
 
 	/* Puts all the match ids into an ArrayList for the predefined player id. */
 	public static void getMatchIds() {
-		ArrayList<Integer> matchIds = new ArrayList<Integer>();
+		matchIds = new ArrayList<Integer>();
 		String matchId = "";
 		int matchesLeft = 25;
 		while (matchesLeft > 0) {
@@ -67,8 +68,7 @@ public class Personal {
 			matchId = String.valueOf(matchIds.get(matchIds.size()-1) - 1);
 		}
 		System.out.println(matchIds);
-		System.out.println(matchIds.size());
-	}
+		System.out.println(matchIds.size());	}
 
 	/* Get the match details for a match id int. */
 	public static JsonObject getMatchDetails(int matchId) {
