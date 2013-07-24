@@ -28,6 +28,7 @@ public class Personal {
 	private static String historyAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key=";
 	private static String detailsAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/?key=";
 	private static final String myId = "76561198005679168";
+	private static final String moId = "76561198013939716";
 	private static ArrayList<Integer> matchIds;
 	private static Connection con;
 
@@ -102,6 +103,19 @@ public class Personal {
 				matchIds.add(iobj.get("match_id").getAsInt());
 			}
 			matchId = String.valueOf(matchIds.get(matchIds.size() - 1) - 1);
+			/* Check if we need any more of the match ids. */
+			String query = "SELECT * FROM matches WHERE match_id = ?";
+			try {
+				PreparedStatement ps = (PreparedStatement) con.prepareStatement(query);
+				ps.setInt(1, matchIds.get(matchIds.size() - 1));
+				ResultSet rs = ps.executeQuery();
+				if (rs.next()) {
+					return;
+				}
+			} catch (SQLException e) {
+				System.out.println("Failed to check database of match_id record in getMatchIds()");
+				e.printStackTrace();
+			}
 		}
 		System.out.println(matchIds);
 		System.out.println(matchIds.size());
@@ -120,10 +134,12 @@ public class Personal {
 	/* Use the match ids to load the match data. */
 	public static void loadMatches() {
 		for (Integer i : matchIds) {
+			System.out.println("Fetching Match: " + i);
 			JsonObject matchInfo = getMatchDetails(i);
 			JsonObject resultObj = matchInfo.getAsJsonObject("result");
 			int match_id = resultObj.get("match_id").getAsInt();
-			String query = "SELECT * FROM matces WHERE match_id = ?";
+			/* Check if this match has been recorded. */
+			String query = "SELECT * FROM matches WHERE match_id = ?";
 			PreparedStatement ps;
 			ResultSet rs;
 			try {
@@ -134,7 +150,8 @@ public class Personal {
 					return;
 				}
 			} catch (SQLException e) {
-				System.out.println("Failed to check database about match entry.");
+				System.out
+						.println("Failed to check database about match entry.");
 				e.printStackTrace();
 			}
 			JsonArray players = resultObj.getAsJsonArray("players");
@@ -175,9 +192,8 @@ public class Personal {
 				int playerKey = 0;
 				try {
 					query = "INSERT INTO player (account_id, player_slot, hero_id, item_0, item_1, item_2, item_3, item_4, item_5, kills, deaths, assists, leaver_status, gold, last_hits, denies, gold_per_min, xp_per_min, gold_spent, hero_damage, tower_damage, hero_healing, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-					ps = (PreparedStatement) con
-							.prepareStatement(query,
-									Statement.RETURN_GENERATED_KEYS);
+					ps = (PreparedStatement) con.prepareStatement(query,
+							Statement.RETURN_GENERATED_KEYS);
 					ps.setInt(1, account_id);
 					ps.setInt(2, player_slot);
 					ps.setInt(3, hero_id);
@@ -259,8 +275,7 @@ public class Personal {
 			int game_mode = resultObj.get("game_mode").getAsInt();
 			query = "INSERT INTO matches (radiant_win, duration, start_time, match_id, match_seq_num, tower_status_radiant, tower_status_dire, barracks_status_radiant, barracks_status_dire, cluster, first_blood_time, lobby_type, human_players, leagueid, positive_votes, negative_votes, game_mode, player_one, player_two, player_three, player_four, player_five, player_six, player_seven, player_eight, player_nine, player_ten) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 			try {
-				ps = (PreparedStatement) con
-						.prepareStatement(query);
+				ps = (PreparedStatement) con.prepareStatement(query);
 				ps.setBoolean(1, radiant_win);
 				ps.setInt(2, duration);
 				ps.setInt(3, start_time);
