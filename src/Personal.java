@@ -122,6 +122,21 @@ public class Personal {
 		for (Integer i : matchIds) {
 			JsonObject matchInfo = getMatchDetails(i);
 			JsonObject resultObj = matchInfo.getAsJsonObject("result");
+			int match_id = resultObj.get("match_id").getAsInt();
+			String query = "SELECT * FROM matces WHERE match_id = ?";
+			PreparedStatement ps;
+			ResultSet rs;
+			try {
+				ps = (PreparedStatement) con.prepareStatement(query);
+				ps.setInt(1, match_id);
+				rs = ps.executeQuery();
+				if (rs.next()) {
+					return;
+				}
+			} catch (SQLException e) {
+				System.out.println("Failed to check database about match entry.");
+				e.printStackTrace();
+			}
 			JsonArray players = resultObj.getAsJsonArray("players");
 			int[] playerKeys = new int[10];
 			int keyPos = 0;
@@ -159,8 +174,8 @@ public class Personal {
 				int level = playerObj.get("level").getAsInt();
 				int playerKey = 0;
 				try {
-					String query = "INSERT INTO player (account_id, player_slot, hero_id, item_0, item_1, item_2, item_3, item_4, item_5, kills, deaths, assists, leaver_status, gold, last_hits, denies, gold_per_min, xp_per_min, gold_spent, hero_damage, tower_damage, hero_healing, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-					PreparedStatement ps = (PreparedStatement) con
+					query = "INSERT INTO player (account_id, player_slot, hero_id, item_0, item_1, item_2, item_3, item_4, item_5, kills, deaths, assists, leaver_status, gold, last_hits, denies, gold_per_min, xp_per_min, gold_spent, hero_damage, tower_damage, hero_healing, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+					ps = (PreparedStatement) con
 							.prepareStatement(query,
 									Statement.RETURN_GENERATED_KEYS);
 					ps.setInt(1, account_id);
@@ -187,7 +202,7 @@ public class Personal {
 					ps.setInt(22, hero_healing);
 					ps.setInt(23, level);
 					ps.executeUpdate();
-					ResultSet rs = ps.getGeneratedKeys();
+					rs = ps.getGeneratedKeys();
 					rs.next();
 					playerKey = rs.getInt(1);
 					playerKeys[keyPos] = playerKey;
@@ -204,9 +219,9 @@ public class Personal {
 						int ability = ability_upgrade.get("ability").getAsInt();
 						int time = ability_upgrade.get("time").getAsInt();
 						int levell = ability_upgrade.get("level").getAsInt();
-						String query = "INSERT INTO ability_upgrades (id, level, time, ability) VALUES (?, ?, ?, ?)";
+						query = "INSERT INTO ability_upgrades (id, level, time, ability) VALUES (?, ?, ?, ?)";
 						try {
-							PreparedStatement ps = (PreparedStatement) con
+							ps = (PreparedStatement) con
 									.prepareStatement(query);
 							ps.setInt(1, playerKey);
 							ps.setInt(2, levell);
@@ -225,7 +240,6 @@ public class Personal {
 			boolean radiant_win = resultObj.get("radiant_win").getAsBoolean();
 			int duration = resultObj.get("duration").getAsInt();
 			int start_time = resultObj.get("start_time").getAsInt();
-			int match_id = resultObj.get("match_id").getAsInt();
 			int match_seq_num = resultObj.get("match_seq_num").getAsInt();
 			int tower_status_radiant = resultObj.get("tower_status_radiant")
 					.getAsInt();
@@ -243,9 +257,9 @@ public class Personal {
 			int positive_votes = resultObj.get("positive_votes").getAsInt();
 			int negative_votes = resultObj.get("negative_votes").getAsInt();
 			int game_mode = resultObj.get("game_mode").getAsInt();
-			String query = "INSERT INTO matches (radiant_win, duration, start_time, match_id, match_seq_num, tower_status_radiant, tower_status_dire, barracks_status_radiant, barracks_status_dire, cluster, first_blood_time, lobby_type, human_players, leagueid, positive_votes, negative_votes, game_mode, player_one, player_two, player_three, player_four, player_five, player_six, player_seven, player_eight, player_nine, player_ten) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			query = "INSERT INTO matches (radiant_win, duration, start_time, match_id, match_seq_num, tower_status_radiant, tower_status_dire, barracks_status_radiant, barracks_status_dire, cluster, first_blood_time, lobby_type, human_players, leagueid, positive_votes, negative_votes, game_mode, player_one, player_two, player_three, player_four, player_five, player_six, player_seven, player_eight, player_nine, player_ten) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 			try {
-				PreparedStatement ps = (PreparedStatement) con
+				ps = (PreparedStatement) con
 						.prepareStatement(query);
 				ps.setBoolean(1, radiant_win);
 				ps.setInt(2, duration);
