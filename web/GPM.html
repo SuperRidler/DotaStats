@@ -1,0 +1,70 @@
+<html>
+	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+	<script src="http://www.chartjs.org/docs/Chart.js"></script>
+	<script type="text/javascript">
+		var data = {
+			labels : [],
+			datasets : [
+				{
+					fillColor : "rgba(220,220,220,0.5)",
+					strokeColor : "rgba(220,220,220,1)",
+					pointColor : "rgba(220,220,220,1)",
+					pointStrokeColor : "#fff",
+					data : []
+				},
+				{
+					fillColor : "rgba(151,187,205,0.5)",
+					strokeColor : "rgba((151,187,205,1)",
+					pointColor : "rgba(151,187,205,1)",
+					pointStrokeColor : "#fff",
+					data : []
+				}
+			]
+		};
+		var readyOne = false;
+		var readyTwo = false;
+		$.getJSON('/DotaStats/Stats.php?stat=gpm&id=45413440', {}, function(json) {
+			var j = 0;
+			var s = 0;
+			for (var i = 1; i <= Object.keys(json).length; i++) {
+				s += parseInt(json[i]);
+				j++;
+				if (j == 3) {
+					s = s/3;
+					data.labels.push("");
+					data.datasets[0].data.push(s);
+					s = 0;
+					j = 0;
+				}
+			}
+			console.log(data);
+			readyOne = true;
+			display();
+		});
+		$.getJSON('/DotaStats/Stats.php?stat=gpm&id=53673988', {}, function(json) {
+			var j = 0;
+			var s = 0;
+			for (var i = 1; i <= Object.keys(json).length; i++) {
+				s += parseInt(json[i]);
+				j++;
+				if (j == 3) {
+					s = s/3;
+					//data.labels.push("");
+					data.datasets[1].data.push(s);
+					s = 0;
+					j = 0;
+				}
+			}
+			console.log(data);
+			readyTwo = true;
+			display();
+		});
+		function display() {
+			if (readyOne && readyTwo) {
+				var ctx = document.getElementById("myChart").getContext("2d");
+				var myNewChart = new Chart(ctx).Line(data);
+			}
+		}
+	</script>
+	<canvas id="myChart" width="1800" height="1000"></canvas>
+</html>
