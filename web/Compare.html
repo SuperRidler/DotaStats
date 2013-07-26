@@ -1,0 +1,41 @@
+<html>
+	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+	<script src="http://www.chartjs.org/docs/Chart.js"></script>
+	<script type="text/javascript">
+		var data = {
+			labels : [],
+			datasets : [
+				{
+					fillColor : "rgba(220,220,220,0.5)",
+					strokeColor : "rgba(220,220,220,1)",
+					pointColor : "rgba(220,220,220,1)",
+					pointStrokeColor : "#fff",
+					data : []
+				},
+				{
+					fillColor : "rgba(151,187,205,0.5)",
+					strokeColor : "rgba((151,187,205,1)",
+					pointColor : "rgba(151,187,205,1)",
+					pointStrokeColor : "#fff",
+					data : []
+				}
+			]
+		};
+		$.getJSON('/DotaStats/Stats.php?compare=xpm&playerone=45413440&playertwo=53673988', {}, function(json) {
+			var playerOne = json["45413440"];
+			var playerTwo = json["53673988"];
+			for (var i = 1; i <= Object.keys(playerOne).length; i++) {
+				data.labels.push("");
+				data.datasets[0].data.push(parseInt(playerOne[i]));
+				data.datasets[1].data.push(parseInt(playerTwo[i]));
+			}
+			console.log(data);
+			display();
+		});
+		function display() {
+			var ctx = document.getElementById("myChart").getContext("2d");
+			var myNewChart = new Chart(ctx).Line(data);
+		}
+	</script>
+	<canvas id="myChart" width="1900" height="1000"></canvas>
+</html>
