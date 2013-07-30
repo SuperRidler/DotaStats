@@ -1,12 +1,3 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,85 +6,44 @@ import java.util.Iterator;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 import com.mysql.jdbc.Statement;
 
 public class Personal {
 
-	private static final String driver = "org.gjt.mm.mysql.Driver";
-	private static final String url = "jdbc:mysql://localhost/DotaStats";
-	private static final String keyFile = "key";
 	private static String historyAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key=";
 	private static String detailsAddress = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/?key=";
 	private static final String myId = "76561198005679168";
 	private static final String moId = "76561198013939716";
+	private static final String miId = "76561198030693147";
 	private static ArrayList<Integer> matchIds;
 	private static Connection con;
 
 	public static void main(String[] args) {
-		connectToDB();
+		con = DBUtil.connectToDB();
 		loadKey();
 		getMatchIds();
 		loadMatches();
-		closeDB();
+		DBUtil.closeDB(con);
 		System.out.println("Done");
 	}
 
-	public static void connectToDB() {
-		try {
-			Class.forName(driver);
-			con = (Connection) DriverManager.getConnection(url, "root", "");
-			con.setDumpQueriesOnException(true);
-			System.out.println("Database connection setup.");
-		} catch (Exception e) {
-			System.out.println("Failed to connect to the database.");
-			e.printStackTrace();
-			System.exit(1);
-		}
+	private static void loadKey() {
+		String key = Key.loadKey();
+		historyAddress += key;
+		detailsAddress += key;
 	}
-
-	public static void closeDB() {
-		try {
-			con.close();
-			System.out.println("Connection to database closed.");
-		} catch (Exception e) {
-			System.out.println("Failed to close the database connection.");
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
-
-	/* Attach the API key to the URLs for use. */
-	public static void loadKey() {
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(keyFile));
-			String key = br.readLine();
-			br.close();
-			key += "&";
-			historyAddress += key;
-			detailsAddress += key;
-		} catch (FileNotFoundException e) {
-			System.out.println("File does not exist.");
-			e.printStackTrace();
-			System.exit(1);
-		} catch (IOException e) {
-			System.out.println("Could not read line.");
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
-
+	
 	/* Puts all the match ids into an ArrayList for the predefined player id. */
 	public static void getMatchIds() {
 		matchIds = new ArrayList<Integer>();
 		String matchId = "";
 		int matchesLeft = 25;
 		while (matchesLeft > 0) {
-			String personalLink = historyAddress + "account_id=" + moId
+			String personalLink = historyAddress + "account_id=" + miId
 					+ "&start_at_match_id=" + matchId;
-			JsonObject obj = getJsonRequest(personalLink);
+			JsonObject obj = Request.getJsonRequest(personalLink);
 			JsonObject result = obj.getAsJsonObject("result");
 			matchesLeft = result.get("results_remaining").getAsInt();
 			JsonArray matches = result.getAsJsonArray("matches");
@@ -126,7 +76,7 @@ public class Personal {
 
 	/* Get the match details for a match id string. */
 	public static JsonObject getMatchDetails(String matchId) {
-		return getJsonRequest(detailsAddress + "match_id=" + matchId + "&");
+		return Request.getJsonRequest(detailsAddress + "match_id=" + matchId + "&");
 	}
 
 	/* Use the match ids to load the match data. */
@@ -313,31 +263,5 @@ public class Personal {
 			e.printStackTrace();
 		}
 	}
-
-	/* Return a json object from the given url. */
-	public static JsonObject getJsonRequest(String url) {
-		System.out.println(url);
-		JsonObject obj = new JsonObject();
-		try {
-			URL requestAddress = new URL(url);
-			URLConnection uc = requestAddress.openConnection();
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					uc.getInputStream()));
-			String inputLine = "";
-			String totalInput = "";
-			while ((inputLine = in.readLine()) != null) {
-				totalInput += inputLine;
-			}
-			in.close();
-			obj = new JsonParser().parse(totalInput).getAsJsonObject();
-		} catch (MalformedURLException e) {
-			System.out.println("Could not create URL object.");
-			e.printStackTrace();
-			System.exit(1);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		return obj;
-	}
+	
 }
